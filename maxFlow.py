@@ -23,8 +23,8 @@ class MaxFlow:
         """
         A.reverse()
         P: list[tuple[str, str]] = [A[0]]
-        j = 1
-        while j<len(A):
+        j:int = 1
+        while j < len(A):
             u, v = P[-1]
             p, q = A[j]
             if u == q:
@@ -42,9 +42,9 @@ class MaxFlow:
         b: return True if there is a path
         P: the path: list of edges
         """
-        L:list[str] = list()
+        L: list[str] = list()
         Q: list[tuple[str|None, str]] = [(None,self._src)]
-        A:list[tuple[str,str]] = list()
+        A: list[tuple[str,str]] = list()
         while len(Q) > 0:
             s,v = Q.pop(0)
             if v == self._dst and s:
@@ -63,41 +63,41 @@ class MaxFlow:
         """
         Create Auxiliary NEtwork
         """
-        self._GAux = nx.DiGraph()
+        self._GAux: nx.DiGraph = nx.DiGraph()
         self._GAux.add_nodes_from(self._G.nodes)
-        edgeList=list()
-        edgeList2=dict()
-        for u,v in self._G.edges:
-            weight = self._G.edges[u,v]['weight']
-            edgeList.append((u,v,weight))
-            edgeList.append((v,u,0))
-            edgeList2[(u,v)]='+' #E^{+}
-            edgeList2[(v,u)]='-' #E^{-}
-        self._GAux.add_weighted_edges_from(edgeList)
-        nx.set_edge_attributes(self._GAux, edgeList2, 'direction')
+        edge_list: list[tuple[str,str,float]]=list()
+        edge_dict: dict[tuple[str,str],str]=dict()
+        for u, v in self._G.edges:
+            weight:float = self._G.edges[u,v]['weight']
+            edge_list.append((u,v,weight))
+            edge_list.append((v,u,0))
+            edge_dict[(u,v)] = '+' #E^{+}
+            edge_dict[(v,u)] = '-' #E^{-}
+        self._GAux.add_weighted_edges_from(edge_list)
+        nx.set_edge_attributes(self._GAux, edge_dict, 'direction')
 
     def _update(self,P:list[tuple[str,str]]) -> None:
         """
         Update auxiliary network
         """
-        w = list()
+        w: list[float] = list()
         for u,v in P:
-            weight = self._GAux.edges[u,v]['weight']
+            weight:float = self._GAux.edges[u,v]['weight']
             w.append(weight)
-        d = min(w)
-        for u,v in P:
+        d: float = min(w)
+        for u, v in P:
             self._GAux.edges[u,v]['weight'] -= d
             self._GAux.edges[v,u]['weight'] += d
-        self._updatePath = P
+        self._updatePath: list[tuple[str, str]] = P
 
     def _deploy(self) -> None:
         """
         Set the flow to the network from the auxiliary network
         """
         for u,v in self._GAux.edges:
-            if self._GAux.edges[u,v]['direction']=='-':
-                w = self._GAux.edges[u,v]['weight']
-                self._G.edges[v,u]['flow']=w
+            if self._GAux.edges[u,v]['direction'] == '-':
+                w: float = self._GAux.edges[u,v]['weight']
+                self._G.edges[v,u]['flow'] = w
 
     def oneStep(self)->bool:
         b,P = self._findPath()

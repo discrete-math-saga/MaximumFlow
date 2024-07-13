@@ -7,13 +7,13 @@ class Point(NamedTuple):
     y:float
 
 def drawNetwork(G:nx.DiGraph, position:dict[str,Point],
-                font_size=20, node_size=1000, edge_width=1, node_color='c',arrowsize=10, withFlow=False):
+                font_size=20, node_size=1000, edge_width=1, node_color='c',arrowsize=10, withFlow=False) -> None:
     fig,ax =plt.subplots(figsize=(8,8))
     nx.draw_networkx_nodes(G, position, node_size=node_size,node_color=node_color)
     nx.draw_networkx_labels(G, position, font_size = font_size)
     nx.draw_networkx_edges(G, position, width = edge_width,
         arrows = True, arrowsize = arrowsize ,node_size = node_size)
-    edgeLabels = dict()
+    edgeLabels:dict[tuple[str,str],str] = dict()
     for u,v in G.edges:
         weight = G.edges[u,v]['weight']
         if withFlow:
